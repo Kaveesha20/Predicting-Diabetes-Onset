@@ -15,4 +15,5 @@ The dataset contains 768 records with features such as:
 ## 🚀 Setup Instructions
 1. Clone the repository:
    ```bash
-   git clone 
+   git clone https://github.com/Kaveesha20/Predicting-Diabetes-Onset.git
+2. Run the Jupyter notebook or Python script to train and evaluate the models. 
