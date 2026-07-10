@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diabetes Prediction App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .input-group h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .form-control {
+            margin-bottom: 20px;
+        }
+
+        .form-control label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-control input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control input:hover {
+            border-color: #667eea;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .predict-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        .predict-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .result-container {
+            margin-top: 40px;
+            padding: 30px;
+            border-radius: 15px;
+            display: none;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-container.high-risk {
+            background: #ffebee;
+            border: 3px solid #f44336;
+        }
+
+        .result-container.low-risk {
+            background: #e8f5e9;
+            border: 3px solid #4caf50;
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-header h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .high-risk .result-header h2 {
+            color: #f44336;
+        }
+
+        .low-risk .result-header h2 {
+            color: #4caf50;
+        }
+
+        .probability-display {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .probability-value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .probability-label {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .input-summary {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .input-summary h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .input-summary table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .input-summary td {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .input-summary td:first-child {
+            font-weight: 600;
+            color: #555;
+            width: 40%;
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        .sidebar-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-info h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .sidebar-info li {
+            padding: 8px 0;
+            color: #555;
+        }
+
+        .sidebar-info li:before {
+            content: "▸ ";
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .form-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Diabetes Prediction App</h1>
+            <p>Using Random Forest Machine Learning Model</p>
+        </div>
+
+        <div class="content">
+            {% if error %}
+            <div style="background: #ffebee; border-left: 4px solid #f44336; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+                <h3 style="color: #f44336; margin-bottom: 10px;">⚠️ Model Not Loaded</h3>
+                <p style="color: #555;">{{ error }}</p>
+                <p style="color: #555; margin-top: 10px;"><strong>Steps to resolve:</strong></p>
+                <ol style="color: #555; margin-left: 20px;">
+                    <li>Download <code>diabetes.csv</code> from <a href="https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database" target="_blank">Kaggle</a></li>
+                    <li>Run: <code>python train_model.py</code></li>
+                    <li>Restart the application: <code>python app.py</code></li>
+                </ol>
+            </div>
+            {% endif %}
+            
+            <div class="sidebar-info">
+                <h3>About This Application</h3>
+                <p style="color: #555; line-height: 1.6;">
+                    This application uses a <strong>Random Forest</strong> classifier trained on the 
+                    <strong>Pima Indians Diabetes Dataset</strong> to predict the likelihood of diabetes onset 
+                    based on clinical parameters. Enter patient information below to get a prediction.
+                </p>
+            </div>
+
+            <form id="predictionForm">
+                <div class="form-container">
+                    <div class="input-group">
+                        <h3>Patient Information</h3>
+                        
+                        <div class="form-control">
+                            <label for="pregnancies">Pregnancies</label>
+                            <input type="number" id="pregnancies" name="pregnancies" 
+                                   min="0" max="20" value="1" required>
+                            <div class="help-text">Number of pregnancies</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="glucose">Glucose (mg/dL)</label>
+                            <input type="number" id="glucose" name="glucose" 
+                                   min="0" max="300" value="120" required>
+                            <div class="help-text">Plasma glucose concentration</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="blood_pressure">Blood Pressure (mm Hg)</label>
+                            <input type="number" id="blood_pressure" name="blood_pressure" 
+                                   min="0" max="200" value="70" required>
+                            <div class="help-text">Diastolic blood pressure</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="skin_thickness">Skin Thickness (mm)</label>
+                            <input type="number" id="skin_thickness" name="skin_thickness" 
+                                   min="0" max="100" value="20" required>
+                            <div class="help-text">Triceps skinfold thickness</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <h3>Additional Measurements</h3>
+                        
+                        <div class="form-control">
+                            <label for="insulin">Insulin (mu U/ml)</label>
+                            <input type="number" id="insulin" name="insulin" 
+                                   min="0" max="900" value="80" required>
+                            <div class="help-text">2-hour serum insulin</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="bmi">BMI (kg/m²)</label>
+                            <input type="number" id="bmi" name="bmi" 
+                                   min="0" max="70" step="0.1" value="25.0" required>
+                            <div class="help-text">Body mass index</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="diabetes_pedigree">Diabetes Pedigree Function</label>
+                            <input type="number" id="diabetes_pedigree" name="diabetes_pedigree" 
+                                   min="0" max="3" step="0.01" value="0.5" required>
+                            <div class="help-text">Diabetes pedigree function (genetic risk)</div>
+                        </div>
+
+                        <div class="form-control">
+                            <label for="age">Age (years)</label>
+                            <input type="number" id="age" name="age" 
+                                   min="0" max="120" value="30" required>
+                            <div class="help-text">Age in years</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button type="submit" class="predict-btn" id="predictBtn">
+                        🔍 Predict Diabetes Risk
+                    </button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px; color: #667eea;">Analyzing patient data...</p>
+            </div>
+
+            <div class="result-container" id="resultContainer">
+                <div class="result-header">
+                    <h2 id="resultTitle"></h2>
+                    <p id="resultSubtitle"></p>
+                </div>
+
+                <div class="probability-display">
+                    <div class="probability-value" id="probabilityValue"></div>
+                    <div class="probability-label">Probability of Diabetes</div>
+                </div>
+
+                <div class="input-summary">
+                    <h3>Input Summary</h3>
+                    <table>
+                        <tr>
+                            <td>Pregnancies</td>
+                            <td id="summaryPregnancies"></td>
+                        </tr>
+                        <tr>
+                            <td>Glucose</td>
+                            <td id="summaryGlucose"></td>
+                        </tr>
+                        <tr>
+                            <td>Blood Pressure</td>
+                            <td id="summaryBloodPressure"></td>
+                        </tr>
+                        <tr>
+                            <td>Skin Thickness</td>
+                            <td id="summarySkinThickness"></td>
+                        </tr>
+                        <tr>
+                            <td>Insulin</td>
+                            <td id="summaryInsulin"></td>
+                        </tr>
+                        <tr>
+                            <td>BMI</td>
+                            <td id="summaryBMI"></td>
+                        </tr>
+                        <tr>
+                            <td>Diabetes Pedigree Function</td>
+                            <td id="summaryDiabetesPedigree"></td>
+                        </tr>
+                        <tr>
+                            <td>Age</td>
+                            <td id="summaryAge"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="disclaimer">
+                    <strong>⚕️ Medical Disclaimer:</strong> This prediction is for educational purposes only and should not be used 
+                    as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of 
+                    your physician or other qualified health provider with any questions you may have regarding a medical condition.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const predictBtn = document.getElementById('predictBtn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('resultContainer');
+            
+            // Show loading
+            predictBtn.disabled = true;
+            loading.style.display = 'block';
+            resultContainer.style.display = 'none';
+            
+            // Collect form data
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    // Display results
+                    displayResults(data);
+                }
+            } catch (error) {
+                alert('Error making prediction: ' + error.message);
+            } finally {
+                // Hide loading
+                predictBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        });
+
+        function displayResults(data) {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
+            const probabilityValue = document.getElementById('probabilityValue');
+            
+            // Set risk level
+            if (data.prediction === 1) {
+                resultContainer.className = 'result-container high-risk';
+                resultTitle.textContent = '⚠️ High Risk';
+                resultSubtitle.textContent = 'Diabetes Likely';
+            } else {
+                resultContainer.className = 'result-container low-risk';
+                resultTitle.textContent = '✅ Low Risk';
+                resultSubtitle.textContent = 'No Diabetes Detected';
+            }
+            
+            // Set probability
+            probabilityValue.textContent = (data.probability * 100).toFixed(2) + '%';
+            
+            // Set input summary
+            document.getElementById('summaryPregnancies').textContent = document.getElementById('pregnancies').value;
+            document.getElementById('summaryGlucose').textContent = document.getElementById('glucose').value + ' mg/dL';
+            document.getElementById('summaryBloodPressure').textContent = document.getElementById('blood_pressure').value + ' mm Hg';
+            document.getElementById('summarySkinThickness').textContent = document.getElementById('skin_thickness').value + ' mm';
+            document.getElementById('summaryInsulin').textContent = document.getElementById('insulin').value + ' mu U/ml';
+            document.getElementById('summaryBMI').textContent = document.getElementById('bmi').value + ' kg/m²';
+            document.getElementById('summaryDiabetesPedigree').textContent = document.getElementById('diabetes_pedigree').value;
+            document.getElementById('summaryAge').textContent = document.getElementById('age').value + ' years';
+            
+            // Show result
+            resultContainer.style.display = 'block';
+            
+            // Scroll to result
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>

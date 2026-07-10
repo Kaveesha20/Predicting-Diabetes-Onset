@@ -32,8 +32,32 @@ The dataset contains 768 records with features such as:
 Pima Indians Diabetes Dataset - Kaggle  
 Scikit-Learn Documentation  
 
-## 🚀 Setup Instructions
+## 🚀 Quick Start
+
+### Option 1: Using the Web UI (Recommended)
+
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run the setup script** (downloads dataset and trains model):
+   ```bash
+   python setup.py
+   ```
+
+3. **Start the web application:**
+   ```bash
+   python app.py
+   ```
+
+4. **Open your browser** to: `http://localhost:5000`
+
+### Option 2: Using Jupyter Notebook
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/Kaveesha20/Predicting-Diabetes-Onset.git
+   ```
+
 2. Run the Jupyter notebook or Python script to train and evaluate the models. 
